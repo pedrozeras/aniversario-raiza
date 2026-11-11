@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#060208">
+  <title>Feliz aniversário, Raiza!</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="scene">
+    <div class="stars" aria-hidden="true"></div>
+    <header class="heading">
+      <p class="eyebrow">Uma homenagem especial</p>
+      <h1>Feliz aniversário, <span>Raiza!</span></h1>
+    </header>
+    <section class="cake-area" aria-label="Bolo de aniversário com cinco velas">
+      <div class="candles" id="candles">
+        <div class="candle"><i class="flame"></i></div><div class="candle"><i class="flame"></i></div><div class="candle"><i class="flame"></i></div><div class="candle"><i class="flame"></i></div><div class="candle"><i class="flame"></i></div>
+      </div>
+      <div class="cake"><div class="tier tier-top"><div class="icing"></div></div><div class="tier tier-mid"><div class="icing"></div></div><div class="tier tier-bottom"><div class="icing"></div></div><div class="plate"></div></div>
+      <p class="cake-hint">Toque no botão para apagar as velas</p>
+    </section>
+    <section class="message">
+      <p>Oi, baby. Feliz aniversário para você!</p>
+      <p>Quero que saiba que você é muito especial para mim. Você foi o meu melhor achado, e tenho um enorme carinho e admiração por quem você é.</p>
+      <p>Te desejo muita felicidade e sucesso em sua caminhada, pois isso é algo que você merece muito.</p>
+      <p class="signature">Amo você, minha preta.</p>
+    </section>
+    <section class="controls">
+      <button id="blow" type="button">Apagar as velas</button>
+      <button id="music" type="button" class="secondary">Tocar música</button>
+      <audio id="song" src="musica.mp3" preload="metadata" loop></audio>
+      <p class="music-note">A música começa quando você tocar em “Tocar música”.</p>
+    </section>
+    <footer>Feito especialmente para Raiza Alves</footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
