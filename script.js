@@ -1,0 +1,1 @@
+$(cat /mnt/data/site/Aniversario-Raiza/mobile/script.js)
