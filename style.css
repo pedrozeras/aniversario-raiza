@@ -1,1 +1,33 @@
-$(cat /mnt/data/site/Aniversario-Raiza/mobile/style.css)
+:root{color-scheme:dark;--pink:#f28ab2;--gold:#ffd98a;--bg:#060208}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:#fff;background:radial-gradient(ellipse at 50% 35%,#241020 0%,#100812 42%,#060208 78%);overflow-x:hidden}
+.scene{position:relative;isolation:isolate;width:min(100%,900px);min-height:100vh;margin:auto;padding:38px 20px 24px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.stars{position:fixed;inset:0;z-index:-1;opacity:.55;background-image:radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#f6a7d0 1px,transparent 1.5px);background-size:83px 83px,127px 127px;background-position:0 0,37px 51px;animation:twinkle 5s ease-in-out infinite alternate}
+.heading .eyebrow{margin:0 0 9px;color:#d9a7c8;text-transform:uppercase;letter-spacing:.22em;font-size:.68rem}
+h1{font-size:clamp(1.8rem,6vw,3.2rem);line-height:1.1;margin:0;font-weight:800}
+h1 span{color:var(--pink);text-shadow:0 0 22px #e45b9b88}
+.cake-area{width:min(100%,520px);margin:24px auto 4px;position:relative}
+.candles{height:90px;display:flex;justify-content:center;align-items:flex-end;gap:clamp(17px,5vw,31px);position:relative;z-index:3}
+.candle{width:13px;height:62px;border-radius:4px 4px 1px 1px;background:repeating-linear-gradient(135deg,#fff0f5 0 8px,#80caff 8px 15px);box-shadow:0 0 10px #ffb5d455;position:relative}
+.flame{position:absolute;width:15px;height:23px;left:50%;top:-24px;transform:translateX(-50%);border-radius:55% 45% 55% 45%;background:radial-gradient(ellipse at 50% 70%,#fff9c7 0 17%,#ffd34d 35%,#ff7b26 68%,#ff3e28 100%);filter:drop-shadow(0 0 9px #ff9b35);transform-origin:50% 100%;animation:flicker .16s infinite alternate}
+.cake{width:min(90%,420px);margin:-1px auto 0;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 12px 22px #0009)}
+.tier{position:relative;border-radius:12px 12px 8px 8px;background:linear-gradient(90deg,#a92e67,#f18bb2 24%,#d94e87 65%,#8e2458);border-top:9px solid #ffe1e8;box-shadow:inset 0 -9px 0 #8f2456,inset 0 8px 8px #fff5}
+.tier-top{width:43%;height:75px;z-index:2}.tier-mid{width:66%;height:78px;margin-top:-4px;z-index:1}.tier-bottom{width:88%;height:86px;margin-top:-4px}
+.icing{position:absolute;top:-9px;left:0;right:0;height:19px;background:#ffe4ea;border-radius:12px 12px 7px 7px}
+.icing:after{content:"";position:absolute;left:12%;right:12%;top:9px;height:19px;background:radial-gradient(ellipse at 50% 0,#ffe4ea 0 58%,transparent 62%);background-size:34px 20px;background-repeat:repeat-x}
+.plate{width:96%;height:13px;border-radius:50%;background:linear-gradient(#fff0d0,#c98c50);margin-top:-1px}
+.cake-hint{font-size:.75rem;color:#cbb5c8;margin:12px 0 0}
+.message{width:min(100%,650px);margin:20px auto 0;padding:20px 22px;border:1px solid #f6a7d033;border-radius:18px;background:#170d19bb;box-shadow:0 0 30px #e65b9b12;line-height:1.65;font-size:clamp(.92rem,2.6vw,1.05rem)}
+.message p{margin:0 0 10px}.message p:last-child{margin-bottom:0}.signature{color:#ffc0d8;font-weight:bold}
+.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:19px 0 0}
+button{border:0;border-radius:999px;padding:13px 22px;background:linear-gradient(110deg,#e65b9b,#a92e67);color:#fff;font-weight:700;font-size:.92rem;cursor:pointer;box-shadow:0 6px 20px #d3448440}
+button.secondary{background:#271a2b;border:1px solid #b77b9c;color:#f7d9e8;box-shadow:none}
+button:focus-visible{outline:3px solid #ffe2a3;outline-offset:3px}
+.music-note{flex-basis:100%;margin:1px 0 0;color:#bba8b8;font-size:.72rem}
+footer{margin-top:auto;padding-top:25px;color:#8e7b8d;font-size:.72rem}
+.blown .flame{opacity:0;transform:translateX(-50%) scale(.15);transition:opacity .35s,transform .35s}.blown .candle{opacity:.72}
+@keyframes flicker{from{transform:translateX(-50%) rotate(-5deg) scale(.94,1)}to{transform:translateX(-50%) rotate(5deg) scale(1.04,.96)}}
+@keyframes twinkle{from{opacity:.25}to{opacity:.7}}
+@media(min-width:700px){.scene{padding-top:48px}.cake-area{margin-top:34px}.message{padding:24px 34px}}
+@media(max-width:380px){.scene{padding-left:14px;padding-right:14px}.message{padding:16px;font-size:.9rem}.candle{width:11px}}
