@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#060208">
+<title>Feliz aniversário, Raiza!</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#060208;color:#fff;font-family:Arial,sans-serif}
+body{display:grid;place-items:center;min-height:100svh;overflow:hidden}
+main{width:min(100vw,800px);padding:12px}
+canvas{display:block;width:100%;height:auto;aspect-ratio:1;max-height:calc(100svh - 24px);object-fit:contain}
+.note{position:fixed;bottom:10px;left:0;right:0;text-align:center;color:#a99ba8;font-size:11px;letter-spacing:.04em;pointer-events:none}
+@media(max-height:620px){main{width:min(100vw,calc(100svh - 30px));padding:6px}.note{display:none}}
+</style>
+</head>
+<body>
+<main><canvas id="scene" width="800" height="800" aria-label="Animação de um bolo de aniversário com velas"></canvas></main>
+<div class="note">Feliz aniversário, Raiza!</div>
+<script>
+(() => {
+"use strict";
+const canvas=document.getElementById("scene"),ctx=canvas.getContext("2d");
+const W=800,H=800,BG="#060208",OY=56,TICK=16;
+const INTRO=120,BLOW_GAP=40,BLOW_N=26,BITE_GAP=46;
+const message="Oi, baby, feliz aniversário para você, peço perdão se eu estou errando a data, mas fui me baseando pela compra do presente em meu histórico de quando te dei o livro. Quero que saiba que você é muito especial para mim hoje e sempre, você foi o meu melhor achado, tenho um enorme carinho e admiração por você ser quem é. Te desejo muita felicidade e sucesso em sua caminhada, pois isso é algo que você merece muito. Amo você, minha preta.";
+const words=message.split(/\s+/),HL_START=6,HL_END=words.length-4;
+const parts=[["plate",350,-302,-262,18,18],["base",300,-262,-110,22,10],["mid",225,-110,-5,22,0],["top",150,-5,85,20,0]];
+const tops=Object.fromEntries(parts.map(p=>[p[0],p[3]])),bots=Object.fromEntries(parts.map(p=>[p[0],p[2]]));
+const candleX=[-100,-50,0,50,100],CANDLE_Y0=96,CANDLE_Y1=166,FLAME_Y=170;
+const PAL={plate:[.95,.72,.30],base:[.80,.12,.42],mid:[.95,.30,.55],top:[1,.55,.70]};
+const CREAM=[1,.90,.93],FILL=[1,.80,.55],FLASH=[1,.78,.78],GOLD=[1,.95,.60],PHASE={base:0,mid:1.7,top:3.1};
+const RED=[.95,.10,.05],ORANGE=[1,.55,.05],YELLOW=[1,.80,.25],EMBER=[.30,.04,.02],BGC=[.0235,.0078,.0314];
+let seed=11;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+const rnd=(a,b)=>a+(b-a)*rand(),clamp=v=>Math.max(0,Math.min(1,v)),mix=(a,b,k)=>a.map((v,i)=>v+(b[i]-v)*k),dim=(a,k)=>a.map(v=>v*k);
+const hx=c=>"#"+c.map(v=>Math.round(Math.max(0,Math.min(1,v))*255).toString(16).padStart(2,"0")).join("");
+const cy=y=>-(y+OY),partOf=y=>(parts.find(p=>y>=p[2]&&y<p[3])||parts[1])[0];
+function halfW(part,y){const [,W,y1,y2,Rt,Rb]=part;let w=W;if(Rt&&y>y2-Rt){const d=y-(y2-Rt);w=W-Rt+Math.sqrt(Math.max(0,Rt*Rt-d*d))}else if(Rb&&y<y1+Rb){const d=y1+Rb-y;w=W-Rb+Math.sqrt(Math.max(0,Rb*Rb-d*d))}return w}
+function spans(y){for(const p of parts)if(y>=p[2]&&y<p[3]){const w=halfW(p,y);return w>0?[[-w,w]]:[]}return []}
+function intersect(A,B){const out=[];for(const a of A)for(const b of B){const lo=Math.max(a[0],b[0]),hi=Math.min(a[1],b[1]);if(hi-lo>14)out.push([lo,hi])}return out}
+function drip(part,x){const ph=PHASE[part],a=.5+.5*Math.sin(x/15+ph),b=.5+.5*Math.sin(x/38+ph*2);return 22+26*a*b}
+function colorFor(p){const part=partOf(p.y);let base=PAL[part];if(part==="plate")base=mix(base,[1,1,1],rnd(0,.35));else if(p.hl)base=GOLD;else if(p.y>tops[part]-drip(part,p.x))base=mix(CREAM,base,rnd(0,.18));else if(part!=="base"&&p.y<bots[part]+16)base=mix(FILL,base,rnd(0,.25));else base=mix(base,[1,1,1],rnd(0,.18)+(p.edge?.15:0));return base.map(v=>Math.min(1,v))}
+function layout(size,pitch){ctx.font="bold "+size+"px Arial";const th=size*1.18+4;pitch=pitch||th;const half=th/2,placed=[];let idx=0,y=85-half;
+while(y>-302+half&&idx<words.length){for(const [lo0,hi0] of intersect(spans(y+half),spans(y-half))){if(idx>=words.length)break;const lo=lo0+6,hi=hi0-6,avail=hi-lo,line=[];let sum=0;while(idx<words.length){const ww=ctx.measureText(words[idx]).width;if(sum+ww+7*line.length>avail)break;line.push([idx,ww]);sum+=ww;idx++}if(!line.length)continue;let gap=7,x;if(idx>=words.length||line.length===1){gap=7;x=(lo+hi)/2-(sum+gap*(line.length-1))/2}else{gap=(avail-sum)/(line.length-1);x=lo}for(let i=0;i<line.length;i++){const [wi,ww]=line[i];placed.push({x:x+ww/2,y,text:words[wi],size,edge:i===0||i===line.length-1,hl:wi<HL_START||wi>=HL_END,kind:"body",alive:true});x+=ww+gap}}y-=pitch}return [placed,idx>=words.length,th]}
+function fit(){for(let size=24;size>7;size--){let [placed,ok,th]=layout(size);if(ok){let pitch=th,best=placed;while(pitch<th*1.6){const next=layout(size,pitch+1);if(!next[1])break;best=next[0];pitch++}return best}}return layout(8)[0]}
+let items=fit();for(const cx of [-75,-25,25,75])items.push({x:cx,y:tops.top-2,text:"●",size:13,edge:false,hl:false,color:[.92,.04,.12],kind:"cherry",alive:true});
+for(let ci=0;ci<candleX.length;ci++){let yy=CANDLE_Y0,k=0;while(yy<=CANDLE_Y1){items.push({x:candleX[ci],y:yy,text:"|",size:12,edge:false,hl:false,color:k%2===0?[1,.92,.95]:[.45,.80,1],kind:"candle",ci,alive:true});yy+=13;k++}}
+for(const p of items)if(!p.color)p.color=colorFor(p);
+const flames=candleX.map(x=>({x,active:true})),smoke=[],removals=[];
+const eatable=items.filter(p=>p.kind==="body"||p.kind==="cherry");let eatDone=false,frame=0;
+function drawText(p,x=p.x,y=cy(p.y),alpha=1){ctx.save();ctx.globalAlpha=alpha;ctx.textAlign="center";ctx.textBaseline="middle";ctx.font="bold "+p.size+"px Arial";ctx.shadowColor=hx(dim(p.color,.3));ctx.shadowBlur=5;ctx.fillStyle=hx(p.color);ctx.fillText(p.text,x,y);ctx.shadowBlur=0;ctx.fillStyle=hx(dim(p.color,.2));ctx.globalAlpha=alpha*.45;ctx.fillText(p.text,x,y+2);ctx.restore()}
+function flicker(f){const {x}=f,by=cy(FLAME_Y),k=rand(),h=rnd(20,29),w=rnd(7,10),sway=rnd(-2.5,2.5);f.outer={x:x+sway,y:by-h,w,h:h+2,color:mix(RED,ORANGE,k)};f.inner={x:x+sway*.6,y:by-h*.55,w:w*.45,h:h*.55,color:mix(ORANGE,YELLOW,rnd(.3,1))};f.glow=rnd(22,30)}
+function blowStep(f,u){const by=cy(FLAME_Y),lean=14*Math.pow(u,1.4)+rnd(-1.5,1.5)*(1-u),h=24*Math.pow(1-u,1.2)+2+rnd(0,4)*(1-u),w=8*(1-.55*u);f.outer={x:f.x+lean,y:by-h,w,h:h+2,color:mix(mix(RED,ORANGE,.4),EMBER,u)};f.inner={x:f.x+lean*.6,y:by-h*.55,w:w*.45,h:h*.55,color:mix(YELLOW,RED,clamp(u*1.6))};f.glow=28*(1-.75*u)}
+function finishBlow(f){f.active=false;for(let i=0;i<4;i++)smoke.push({x:f.x+8,y:cy(FLAME_Y)-2,f:-Math.floor(rnd(0,14)),N:Math.floor(rnd(55,80)),ph:rnd(0,6),drift:rnd(6,16)})}
+function remove(p,dx,dy,n,delay=0){p.alive=false;removals.push({p,f:-delay,N:n,dx,dy})}
+function bite(){const pool=eatable.filter(p=>p.alive);if(pool.length<=5){for(const p of pool)remove(p,rnd(-8,8),rnd(16,42),Math.floor(rnd(18,27)),Math.floor(rnd(0,10)));eatDone=true;for(const p of items)if(p.kind==="plate"&&p.alive)remove(p,rnd(-6,6),rnd(20,40),Math.floor(rnd(20,29)),Math.floor((p.x+350)/700*40));return}
+const a=rnd(0,Math.PI*2),vx=Math.cos(a),vy=Math.sin(a),ext=pool.reduce((best,p)=>p.x*vx+p.y*vy>best.x*vx+best.y*vy?p:best,pool[0]),bx=ext.x,by=ext.y,R=rnd(85,115);
+for(const p of pool){let d=Math.hypot((p.x-bx)/1.6,(p.y-by)*1.2)+rnd(-10,10);if(d<=R)remove(p,rnd(-8,8),rnd(16,42),Math.floor(rnd(18,27)),Math.floor(rnd(0,8)))}}
+function drawFlame(f){if(!f.active)return;const by=cy(FLAME_Y),o=f.outer||{x:f.x,y:by-24,w:8,h:26,color:RED},i=f.inner||{x:f.x,y:by-13,w:3.6,h:14,color:YELLOW};ctx.save();ctx.fillStyle=hx(dim(ORANGE,.16));ctx.beginPath();ctx.ellipse(f.x,by-10,f.glow||25,(f.glow||25)+10,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=hx(o.color);ctx.beginPath();ctx.ellipse(o.x,o.y+o.h/2,o.w,o.h/2,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=hx(i.color);ctx.beginPath();ctx.ellipse(i.x,i.y+i.h/2,i.w,i.h/2,0,0,Math.PI*2);ctx.fill();ctx.restore()}
+function drawCakeBase(){ctx.save();ctx.fillStyle="#f2b84d";ctx.beginPath();ctx.ellipse(0,cy(-284),350,18,0,0,Math.PI*2);ctx.fill();for(const p of parts.slice(1)){const [name,w,y1,y2]=p;ctx.fillStyle=hx(PAL[name]);ctx.beginPath();ctx.moveTo(-w,cy(y1));ctx.lineTo(-w,cy(y2));ctx.quadraticCurveTo(-w,cy(y2+20),-w+20,cy(y2));ctx.lineTo(w-20,cy(y2));ctx.quadraticCurveTo(w,cy(y2+20),w,cy(y2));ctx.lineTo(w,cy(y1));ctx.closePath();ctx.fill()}ctx.restore()}
+function render(){ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);drawCakeBase();
+for(const p of items)if(p.alive)drawText(p);
+for(const f of flames)drawFlame(f);
+for(let i=smoke.length-1;i>=0;i--){const s=smoke[i];s.f++;if(s.f<=0)continue;const u=clamp(s.f/s.N),x=s.x+s.drift*u+5*Math.sin(u*7+s.ph),y=s.y-60*u,rad=2+8*u;ctx.fillStyle=hx(mix(BGC,[.62,.62,.68],.75*Math.pow(1-u,1.3)));ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.fill();if(u>=1)smoke.splice(i,1)}
+for(let i=removals.length-1;i>=0;i--){const r=removals[i];r.f++;if(r.f<=0)continue;const u=clamp(r.f/r.N),p=r.p,off=r.dy>0?r.dy*u*u:r.dy*(1-Math.pow(1-u,2)),x=p.x+r.dx*u,y=cy(p.y)+off;drawText({...p,color:mix(p.color,BGC,u)},x,y,1-u);if(u>=1)removals.splice(i,1)}
+}
+function tick(){frame++;flames.forEach((f,i)=>{const t0=INTRO+i*BLOW_GAP;if(frame<t0){if(frame%5===0)flicker(f)}else if(frame<t0+BLOW_N)blowStep(f,(frame-t0)/BLOW_N);else if(frame===t0+BLOW_N)finishBlow(f);if(frame===t0+BLOW_N+6){for(const p of items)if(p.kind==="candle"&&p.ci===i&&p.alive)remove(p,0,-36,24)}});const eatStart=INTRO+(candleX.length-1)*BLOW_GAP+BLOW_N+40;if(frame>=eatStart&&!eatDone&&(frame-eatStart)%BITE_GAP===0)bite();render();if(!(eatDone&&removals.length===0&&smoke.length===0))setTimeout(tick,TICK)}
+function resize(){const scale=Math.min(canvas.clientWidth/W,canvas.clientHeight/H);ctx.setTransform(1,0,0,1,0,0)}
+window.addEventListener("resize",resize);resize();tick();
+})();
+</script>
+</body>
+</html>
